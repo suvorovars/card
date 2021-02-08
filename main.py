@@ -12,9 +12,9 @@ api_server = "http://static-maps.yandex.ru/1.x/"
 class Window(QWidget):
     def __init__(self):
         super().__init__()
-        self.lon = '37.677751'
-        self.lat = '55.757718'
-        self.delta = 0.02
+        self.lon = 37.677751
+        self.lat = 55.757718
+        self.delta = 0.002
         uic.loadUi('untitled.ui', self)
         self.update()
         self.btn.clicked.connect(self.run)
@@ -24,7 +24,7 @@ class Window(QWidget):
 
     def update(self):
         params = {
-            "ll": ",".join([self.lon, self.lat]),
+            "ll": ",".join([str(self.lon), str(self.lat)]),
             "spn": ",".join([str(self.delta), str(self.delta)]),
             "l": "map"
         }
@@ -45,25 +45,44 @@ class Window(QWidget):
 
 
     def run(self):
-        self.lon = self.line1.text()
-        self.lat = self.line2.text()
+        self.lon = float(self.line1.text())
+        self.lat = float(self.line2.text())
         self.update()
 
 
     def keyPressEvent(self, event):
-        print(self.delta)
-        if event.key() == Qt.Key_PageDown:
+        print(self.delta, self.lat, self.lon, event.key())
+        if event.key() == Qt.Key_Left:
+            if self.lon > - 180:
+                self.lon -= 0.0001
+                self.update()
+
+        elif event.key() == Qt.Key_Right:
+            if self.lon < 180:
+                self.lon += 0.0001
+                self.update()
+
+        elif event.key() == Qt.Key_Up:
+            print(1)
+            self.lat += 0.0001
+            self.update()
+
+        elif event.key() == 16777237:
+            print(2)
+            self.lat -= 0.0001
+            self.update()
+
+        elif event.key() == Qt.Key_PageDown:
             print('1')
             if self.delta > 0.0005:
                 self.delta -= 0.0005
                 self.update()
 
-        if event.key() == Qt.Key_PageUp:
+        elif event.key() == Qt.Key_PageUp:
             if self.delta < 10:
                 self.delta += 0.0005
                 self.update()
                 print('2')
-
 
 
 if __name__ == '__main__':
